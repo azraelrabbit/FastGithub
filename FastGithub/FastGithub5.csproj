@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<Nullable>enable</Nullable>
+		<TargetFrameworks>net5.0</TargetFrameworks>
+		<Version>1.0.0-beta4</Version>
+		<Description>github定制版的dns服务，解析github最优的ip</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Copyright>https://github.com/xljiulang/FastGithub</Copyright>
+	</PropertyGroup>
+
+ 
+
+	<ItemGroup>
+		<PackageReference Include="PInvoke.AdvApi32" Version="0.7.104" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
+		<ProjectReference Include="..\FastGithub.Dns\FastGithub.Dns.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="README.MD">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>

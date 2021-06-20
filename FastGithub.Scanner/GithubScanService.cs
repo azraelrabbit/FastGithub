@@ -2,7 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,6 +23,9 @@ namespace FastGithub.Scanner
 
         private readonly InvokeDelegate<GithubContext> fullScanDelegate;
         private readonly InvokeDelegate<GithubContext> resultScanDelegate;
+
+
+        private  List<AvaDomain> _avaliableGithubs=   new List<AvaDomain>();
 
         /// <summary>
         /// github扫描服务
@@ -99,7 +105,65 @@ namespace FastGithub.Scanner
                 await this.resultScanDelegate(context);
             }
 
+            //var avaliables=contexts.Where(p => p.Available).ToList();
+
+            //avaliables.Where(p=>p.)
+
+
+          
+
+            var avaliables = contexts.Where(item => item.History.AvailableRate > 0d);
+                //.OrderByDescending(item => item.History.AvailableRate)
+                //.ThenBy(item => item.History.AvgElapsed);
+
+            var domains = avaliables.Select(p => p.Domain).Distinct().ToList();
+
+            foreach (var domain in domains)
+            {
+                var dl=avaliables.Where(p => p.Domain == domain).ToList() .OrderByDescending(item => item.History.AvailableRate)
+                    .ThenBy(item => item.History.AvgElapsed);
+
+                var da = dl.FirstOrDefault();
+
+                if (da != null)
+                {
+                    if (_avaliableGithubs.Exists(p => p.Domain == da.Domain))
+                    {
+                        var ei = _avaliableGithubs.FirstOrDefault(p => p.Domain == da.Domain);
+                        ei.IpAddress = da.Address;
+                    }
+                    else
+                    {
+                        _avaliableGithubs.Add(new AvaDomain()
+                        {
+                            Domain = da.Domain,
+                            IpAddress = da.Address
+                        });
+                    }
+                }
+            }
+
+            //show up domain hosts
+            var sb = new StringBuilder();
+            sb.AppendLine("=========the github hosts==========");
+
+            foreach (var ag in _avaliableGithubs)
+            {
+                sb.AppendLine($"{ag.IpAddress.ToString()}  {ag.Domain}");
+            }
+
+            sb.AppendLine("=========the github hosts end======");
+
+            this.logger.LogInformation(sb.ToString());
+
             this.logger.LogInformation($"结果扫描结束，共扫描{results.Length}条记录");
         }
+    }
+
+    internal class AvaDomain
+    {
+        public string Domain { get; set; }
+
+        public IPAddress IpAddress { get; set; }
     }
 }

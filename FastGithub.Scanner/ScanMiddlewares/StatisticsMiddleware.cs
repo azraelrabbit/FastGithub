@@ -47,6 +47,7 @@ namespace FastGithub.Scanner.ScanMiddlewares
                     context.History.Add(context.Available, stopwatch.Elapsed);
                     if (context.History.AvailableRate > 0d)
                     {
+                        
                         this.logger.LogInformation(context.ToString());
                     }
                 }
